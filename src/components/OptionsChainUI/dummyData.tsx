@@ -1,0 +1,127 @@
+import { OptionChainData } from "../OptionsChainUI/types";
+
+export const dummyOptionChainData: OptionChainData = {
+  query_execution_status: "RowLimit",
+  query_execution_message: "",
+  repository_owner: "post-no-preference",
+  repository_name: "options",
+  commit_ref: "master",
+  sql_query: "SELECT * FROM `option_chain`",
+  schema: [
+    {
+      columnName: "date",
+      columnType: "date",
+    },
+    {
+      columnName: "act_symbol",
+      columnType: "varchar(16383)",
+    },
+    {
+      columnName: "expiration",
+      columnType: "date",
+    },
+    {
+      columnName: "strike",
+      columnType: "decimal(7,2)",
+    },
+    {
+      columnName: "call_put",
+      columnType: "varchar(16383)",
+    },
+    {
+      columnName: "bid",
+      columnType: "decimal(7,2)",
+    },
+    {
+      columnName: "ask",
+      columnType: "decimal(7,2)",
+    },
+    {
+      columnName: "vol",
+      columnType: "decimal(5,4)",
+    },
+    {
+      columnName: "delta",
+      columnType: "decimal(5,4)",
+    },
+    {
+      columnName: "gamma",
+      columnType: "decimal(5,4)",
+    },
+    {
+      columnName: "theta",
+      columnType: "decimal(5,4)",
+    },
+    {
+      columnName: "vega",
+      columnType: "decimal(5,4)",
+    },
+    {
+      columnName: "rho",
+      columnType: "decimal(5,4)",
+    },
+  ],
+  rows: [
+    {
+      date: "2019-02-09",
+      act_symbol: "A",
+      expiration: "2019-02-15",
+      strike: "175.00",
+      call_put: "Call",
+      bid: "10.50",
+      ask: "11.25",
+      vol: "0.2705",
+      delta: "1.0000",
+      gamma: "0.0000",
+      theta: "-0.0046",
+      vega: "0.0000",
+      rho: "0.0124",
+    },
+    {
+      date: "2019-02-09",
+      act_symbol: "A",
+      expiration: "2019-02-15",
+      strike: "175.00",
+      call_put: "Put",
+      bid: "7.80",
+      ask: "8.00",
+      vol: "0.2229",
+      delta: "-0.6033",
+      gamma: "0.0286",
+      theta: "-0.0487",
+      vega: "0.2383",
+      rho: "-0.1116",
+    },
+    {
+      date: "2019-02-09",
+      act_symbol: "AAPL",
+      expiration: "2019-03-29",
+      strike: "170.00",
+      call_put: "Call",
+      bid: "6.30",
+      ask: "6.50",
+      vol: "0.2371",
+      delta: "0.5444",
+      gamma: "0.0268",
+      theta: "-0.0661",
+      vega: "0.2474",
+      rho: "0.1158",
+    },
+    {
+      date: "2019-02-09",
+      act_symbol: "AAPL",
+      expiration: "2019-03-29",
+      strike: "170.00",
+      call_put: "Put",
+      bid: "5.20",
+      ask: "5.40",
+      vol: "0.2314",
+      delta: "-0.4599",
+      gamma: "0.0280",
+      theta: "-0.0537",
+      vega: "0.2474",
+      rho: "-0.0920",
+    },
+    // Add more rows here as needed
+  ],
+};
