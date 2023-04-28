@@ -23,23 +23,44 @@ const dummyData: OptionRow[] = dummyOptionChainData.rows;
 function OptionsChainUI() {
   const [selectedSymbol, setSelectedSymbol] = useState("");
   const [selectedLayout, setSelectedLayout] = useState("unified");
+  const [selectedDate, setSelectedDate] = useState("");
 
   // Get unique symbols from dummy data
   const uniqueSymbols = Array.from(
     new Set(dummyData.map((row) => row.act_symbol))
   );
 
-  // Get filtered data based on selected symbol
-  const filteredData = dummyData.filter(
-    (row) => row.act_symbol === selectedSymbol
-  );
-
+  // Render the unique symbols as options.
   const renderOptions = () =>
     uniqueSymbols.map((symbol) => (
       <option key={symbol} value={symbol}>
         {symbol}
       </option>
     ));
+
+  // Get unique dates for the selected symbol
+  const uniqueDates = Array.from(
+    new Set(
+      dummyData
+        .filter((row) => row.act_symbol === selectedSymbol)
+        .map((row) => row.date)
+    )
+  );
+
+  // Render the unique dates as options
+  const renderDateOptions = () =>
+    uniqueDates.map((date) => (
+      <option key={date} value={date}>
+        {date}
+      </option>
+    ));
+
+  // Get filtered data based on selected symbol and date
+  const filteredData = dummyData.filter(
+    (row) =>
+      row.act_symbol === selectedSymbol &&
+      (selectedDate === "" || row.date === selectedDate)
+  );
 
   const renderTableRows = () => {
     const rows: JSX.Element[] = [];
@@ -88,6 +109,13 @@ function OptionsChainUI() {
       >
         <option value="">Select a Symbol</option>
         {renderOptions()}
+      </select>
+      <select
+        value={selectedDate}
+        onChange={(e) => setSelectedDate(e.target.value)}
+      >
+        <option value="">Select a Date</option>
+        {renderDateOptions()}
       </select>
       <select
         value={selectedLayout}

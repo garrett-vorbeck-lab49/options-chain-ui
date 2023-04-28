@@ -17,9 +17,9 @@ Option Chain: What It Is and How To Read and Analyze It
 https://www.investopedia.com/terms/o/optionchain.asp
 
 TODO:
-- consolidating rows of matching call/put contracts (based on symbol, date, and strike price)
+x consolidating rows of matching call/put contracts (based on symbol, date, and strike price)
 - in/out of the money stacking
-- date filtering
+x date filtering
 - layout prop to display data differently
 - README.md should match other source component layouts
 - What would demo website look like
