@@ -1,4 +1,4 @@
-import { OptionChainData } from "../OptionsChainUI/types";
+import { OptionChainData } from "./types";
 
 export const dummyOptionChainData: OptionChainData = {
   query_execution_status: "RowLimit",
@@ -82,6 +82,36 @@ export const dummyOptionChainData: OptionChainData = {
       act_symbol: "A",
       expiration: "2019-02-15",
       strike: "175.00",
+      call_put: "Put",
+      bid: "7.80",
+      ask: "8.00",
+      vol: "0.2229",
+      delta: "-0.6033",
+      gamma: "0.0286",
+      theta: "-0.0487",
+      vega: "0.2383",
+      rho: "-0.1116",
+    },
+    {
+      date: "2019-03-19",
+      act_symbol: "A",
+      expiration: "2019-03-25",
+      strike: "75.00",
+      call_put: "Call",
+      bid: "10.50",
+      ask: "11.25",
+      vol: "0.2705",
+      delta: "1.0000",
+      gamma: "0.0000",
+      theta: "-0.0046",
+      vega: "0.0000",
+      rho: "0.0124",
+    },
+    {
+      date: "2019-03-19",
+      act_symbol: "A",
+      expiration: "2019-03-25",
+      strike: "75.00",
       call_put: "Put",
       bid: "7.80",
       ask: "8.00",

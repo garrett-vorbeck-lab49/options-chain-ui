@@ -1,112 +1,133 @@
 import React, { useState } from "react";
-import { OptionChainRow, OptionChainData } from "./types";
+import { dummyOptionChainData } from "./dummyData";
 
-/*
-Sources:
-
-Options Trading for Beginners (WITH DETAILED EXAMPLES)
-https://www.youtube.com/watch?v=TyZsemV_0YA
-
-Screenshot of Options Chain UI from E*Trade
-https://user-images.githubusercontent.com/63244584/228619389-ea12555e-2d1b-4548-a34b-861a971986f3.png
-
-Source of dummy data:
-https://www.dolthub.com/repositories/post-no-preference/options/data/master/option_chain
-
-Option Chain: What It Is and How To Read and Analyze It
-https://www.investopedia.com/terms/o/optionchain.asp
-
-TODO:
-- in/out of the money stacking
-- date filtering
-- consolidating rows of matching call/put contracts (based on symbol, date, and strike price)
-*/
-
-interface OptionsChainUIProps {
-  data: OptionChainData;
+interface OptionRow {
+  date: string;
+  act_symbol: string;
+  expiration: string;
+  strike: string;
+  call_put: string;
+  bid: string;
+  ask: string;
+  vol: string;
+  delta: string;
+  gamma: string;
+  theta: string;
+  vega: string;
+  rho: string;
 }
 
-const OptionsChainUI: React.FC<OptionsChainUIProps> = ({ data }) => {
-  const [selectedSymbol, setSelectedSymbol] = useState(data.rows[0].act_symbol);
+// Use the rows from dummyOptionChainData
+const dummyData: OptionRow[] = dummyOptionChainData.rows;
 
-  const handleSymbolChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedSymbol(event.target.value);
-  };
+function OptionsChainUI() {
+  const [selectedSymbol, setSelectedSymbol] = useState("");
+  const [selectedLayout, setSelectedLayout] = useState("unified");
 
-  const filteredRows = data.rows.filter(
+  // Get unique symbols from dummy data
+  const uniqueSymbols = Array.from(
+    new Set(dummyData.map((row) => row.act_symbol))
+  );
+
+  // Get filtered data based on selected symbol
+  const filteredData = dummyData.filter(
     (row) => row.act_symbol === selectedSymbol
   );
 
-  const groupedRows: OptionChainRow[][] = [];
-  filteredRows.forEach((row) => {
-    const existingGroup = groupedRows.find(
-      (group) => group[0].date === row.date && group[0].strike === row.strike
-    );
-    if (existingGroup) {
-      existingGroup.push(row);
-    } else {
-      groupedRows.push([row]);
-    }
-  });
+  const renderOptions = () =>
+    uniqueSymbols.map((symbol) => (
+      <option key={symbol} value={symbol}>
+        {symbol}
+      </option>
+    ));
 
-  const uniqueSymbols = Array.from(
-    new Set(data.rows.map((row) => row.act_symbol))
-  );
+  const renderTableRows = () => {
+    const rows: JSX.Element[] = [];
+
+    // Iterate through filtered data and group Call and Put pairs together
+    for (let i = 0; i < filteredData.length; i += 2) {
+      const callRow = filteredData[i];
+      const putRow = filteredData[i + 1];
+
+      rows.push(
+        <tr
+          key={`${callRow.act_symbol}_${callRow.expiration}_${callRow.strike}`}
+        >
+          <td>{callRow.expiration}</td>
+          <td>{callRow.call_put}</td>
+          <td>{callRow.bid}</td>
+          <td>{callRow.ask}</td>
+          <td>{callRow.vol}</td>
+          <td>{callRow.delta}</td>
+          <td>{callRow.gamma}</td>
+          <td>{callRow.theta}</td>
+          <td>{callRow.vega}</td>
+          <td>{callRow.rho}</td>
+          <td>{callRow.strike}</td>
+          <td>{putRow.call_put}</td>
+          <td>{putRow.bid}</td>
+          <td>{putRow.ask}</td>
+          <td>{putRow.vol}</td>
+          <td>{putRow.delta}</td>
+          <td>{putRow.gamma}</td>
+          <td>{putRow.theta}</td>
+          <td>{putRow.vega}</td>
+          <td>{putRow.rho}</td>
+        </tr>
+      );
+    }
+
+    return rows;
+  };
 
   return (
     <div>
-      <select value={selectedSymbol} onChange={handleSymbolChange}>
-        {uniqueSymbols.map((symbol, index) => (
-          <option key={index} value={symbol}>
-            {symbol}
-          </option>
-        ))}
+      <select
+        value={selectedSymbol}
+        onChange={(e) => setSelectedSymbol(e.target.value)}
+      >
+        <option value="">Select a Symbol</option>
+        {renderOptions()}
       </select>
-      {groupedRows.map((group, index) => (
-        <div key={index}>
-          <h2>{`${group[0].date} - ${group[0].strike}`}</h2>
-          <table>
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>Strike</th>
-                <th>Call/Put</th>
-                <th>Bid</th>
-                <th>Ask</th>
-                <th>Vol</th>
-                <th>Delta</th>
-                <th>Gamma</th>
-                <th>Theta</th>
-                <th>Vega</th>
-                <th>Rho</th>
-              </tr>
-            </thead>
-            <tbody>
-              {group.map((row, index) => (
-                <tr key={index}>
-                  {index === 0 && (
-                    <>
-                      <td rowSpan={group.length}>{row.date}</td>
-                      <td rowSpan={group.length}>{row.strike}</td>
-                    </>
-                  )}
-                  <td>{row.call_put}</td>
-                  <td>{row.bid}</td>
-                  <td>{row.ask}</td>
-                  <td>{row.vol}</td>
-                  <td>{row.delta}</td>
-                  <td>{row.gamma}</td>
-                  <td>{row.theta}</td>
-                  <td>{row.vega}</td>
-                  <td>{row.rho}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      ))}
+      <select
+        value={selectedLayout}
+        onChange={(e) => setSelectedLayout(e.target.value)}
+      >
+        <option value="unified" selected>
+          Unified Rows
+        </option>
+        <option value="split">Split Rows</option>
+      </select>
+      {selectedSymbol && <h2>{selectedSymbol}</h2>}
+      <table>
+        <thead>
+          <tr>
+            <th>Expiration</th>
+            <th>Call/Put</th>
+            <th>Bid</th>
+            <th>Ask</th>
+            <th>Vol</th>
+            <th>Delta</th>
+            <th>Gamma</th>
+            <th>Theta</th>
+            <th>Vega</th>
+            <th>Rho</th>
+            <th>Strike</th>
+            <th>Call/Put</th>
+            <th>Bid</th>
+            <th>Ask</th>
+            <th>Vol</th>
+            <th>Delta</th>
+            <th>Gamma</th>
+            <th>Theta</th>
+            <th>Vega</th>
+            <th>Rho</th>
+          </tr>
+        </thead>
+        <tbody>{renderTableRows()}</tbody>
+      </table>
     </div>
   );
-};
+}
 
 export default OptionsChainUI;
