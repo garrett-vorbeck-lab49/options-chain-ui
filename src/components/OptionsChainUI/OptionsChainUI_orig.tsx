@@ -25,6 +25,7 @@ x date filtering
 - What would demo website look like
 - Storybook controls (ex: layout)
 - compelling demo: realistic dummy data. Colors (configurable, react-value-flash in a table cell)
+- alphavantage stock ticker data or a setTimeout of dummy data.
 */
 
 interface OptionsChainUIProps {

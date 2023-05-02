@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { dummyOptionChainData } from "./dummyData";
 
 interface OptionRow {
@@ -20,10 +20,27 @@ interface OptionRow {
 // Use the rows from dummyOptionChainData
 const dummyData: OptionRow[] = dummyOptionChainData.rows;
 
-function OptionsChainUI() {
+interface OptionsChainUIProps {
+  // Text of Call button
+  callClickBtn?: string;
+  // Text of Put button
+  putClickBtn?: string;
+  // Function for Call button
+  callClickFunction?: Function;
+  // Function for Put button
+  putClickFunction?: Function;
+}
+
+function OptionsChainUI({
+  callClickBtn = "Call Click",
+  putClickBtn = "Put Click",
+  callClickFunction,
+  putClickFunction,
+}: OptionsChainUIProps) {
   const [selectedSymbol, setSelectedSymbol] = useState("");
   const [selectedLayout, setSelectedLayout] = useState("unified");
   const [selectedDate, setSelectedDate] = useState("");
+  const [stockPrice, setStockPrice] = useState<number | null>(null);
 
   // Get unique symbols from dummy data
   const uniqueSymbols = Array.from(
@@ -55,26 +72,58 @@ function OptionsChainUI() {
       </option>
     ));
 
-  // Get filtered data based on selected symbol and date
-  const filteredData = dummyData.filter(
-    (row) =>
-      row.act_symbol === selectedSymbol &&
-      (selectedDate === "" || row.date === selectedDate)
-  );
+  // Get filtered data based on selected symbol and date, and sort by strike value
+  const filteredData = dummyData
+    .filter(
+      (row) =>
+        row.act_symbol === selectedSymbol &&
+        (selectedDate === "" || row.date === selectedDate)
+    )
+    .sort((a, b) => parseFloat(b.strike) - parseFloat(a.strike));
 
   const renderTableRows = () => {
-    const rows: JSX.Element[] = [];
+    const rowData: Array<{
+      row: JSX.Element;
+      isCallInMoney: boolean;
+      isPutInMoney: boolean;
+    }> = [];
 
     // Iterate through filtered data and group Call and Put pairs together
     for (let i = 0; i < filteredData.length; i += 2) {
       const callRow = filteredData[i];
       const putRow = filteredData[i + 1];
 
-      rows.push(
+      // Determine if the option is in the money
+      const isCallInMoney =
+        (stockPrice && parseFloat(callRow.strike) < stockPrice) || false;
+      const isPutInMoney =
+        (stockPrice && parseFloat(putRow.strike) > stockPrice) || false;
+
+      const row = (
         <tr
           key={`${callRow.act_symbol}_${callRow.expiration}_${callRow.strike}`}
+          style={{
+            backgroundColor: isCallInMoney
+              ? "lightgreen"
+              : isPutInMoney
+              ? "lightsalmon"
+              : "inherit",
+          }}
         >
           <td>{callRow.expiration}</td>
+          <td>
+            <button
+              onClick={(event) => {
+                if (callClickFunction) {
+                  callClickFunction(event);
+                } else {
+                  console.log(callRow);
+                }
+              }}
+            >
+              {callClickBtn}
+            </button>
+          </td>
           <td>{callRow.call_put}</td>
           <td>{callRow.bid}</td>
           <td>{callRow.ask}</td>
@@ -94,15 +143,68 @@ function OptionsChainUI() {
           <td>{putRow.theta}</td>
           <td>{putRow.vega}</td>
           <td>{putRow.rho}</td>
+          <td>
+            <button
+              onClick={(event) => {
+                if (putClickFunction) {
+                  putClickFunction(event);
+                } else {
+                  console.log(putRow);
+                }
+              }}
+            >
+              {putClickBtn}
+            </button>
+          </td>
         </tr>
       );
+      rowData.push({ row, isCallInMoney, isPutInMoney });
     }
+    // Sort rowData based on isCallInMoney and isPutInMoney
+    rowData.sort((a, b) => {
+      if (a.isCallInMoney && !b.isCallInMoney) {
+        return -1;
+      } else if (!a.isCallInMoney && b.isCallInMoney) {
+        return 1;
+      } else if (a.isPutInMoney && !b.isPutInMoney) {
+        return 1;
+      } else if (!a.isPutInMoney && b.isPutInMoney) {
+        return -1;
+      } else {
+        return 0;
+      }
+    });
 
-    return rows;
+    return rowData.map((data) => data.row);
   };
+
+  const updateStockPrice = (index: number) => {
+    const values = [175.3, 175.8, 175.2, 174.6, 173.8, 176.2, 170, 172.5];
+    if (index >= values.length) {
+      index = 0;
+    }
+    setStockPrice(values[index]);
+    setTimeout(() => updateStockPrice(index + 1), 5000);
+  };
+
+  useEffect(() => {
+    updateStockPrice(0);
+    return () => {
+      // Cleanup
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div>
+      {selectedSymbol && (
+        <div>
+          <h2>
+            {selectedSymbol} Stock Price:{" "}
+            {stockPrice ? stockPrice.toFixed(2) : "N/A"}
+          </h2>
+        </div>
+      )}
       <select
         value={selectedSymbol}
         onChange={(e) => setSelectedSymbol(e.target.value)}
@@ -121,9 +223,7 @@ function OptionsChainUI() {
         value={selectedLayout}
         onChange={(e) => setSelectedLayout(e.target.value)}
       >
-        <option value="unified" selected>
-          Unified Rows
-        </option>
+        <option value="unified">Unified Rows</option>
         <option value="split">Split Rows</option>
       </select>
       {selectedSymbol && <h2>{selectedSymbol}</h2>}

@@ -5,7 +5,9 @@ import OptionsChainUI from "./components/OptionsChainUI/OptionsChainUI";
 function App() {
   return (
     <div className="App">
-      <OptionsChainUI />
+      {/* <OptionsChainUI callClickBtn="BOOM!" putClickBtn="POW!" /> */}
+      <OptionsChainUI callClickFunction={() => alert("hello")} />
+      {/* <OptionsChainUI /> */}
     </div>
   );
 }
